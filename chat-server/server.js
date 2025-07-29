@@ -1,16 +1,27 @@
 // server.js
-const WebSocket = require('ws');
+const express = require('express'); // استيراد Express
+const WebSocket = require('ws');    // استيراد مكتبة WebSocket
 
-// استخدام process.env.PORT لكي يعمل على Render.com أو 8080 محلياً
-const PORT = process.env.PORT || 8080; 
+const app = express(); // إنشاء تطبيق Express
+const PORT = process.env.PORT || 8080; // استخدام البورت من متغيرات البيئة أو 8080 محلياً
 
-const wss = new WebSocket.Server({ port: PORT });
+// <--- جديد: لخدمة الملفات الثابتة (لو عايز تخدم الـ frontend من نفس الخادم)
+// app.use(express.static('public')); // لو مجلد الـ public في نفس مستوى الـ chat-server
+
+// تشغيل خادم HTTP باستخدام Express
+const server = app.listen(PORT, () => {
+    console.log(`HTTP server listening on port ${PORT}`);
+});
+
+// إنشاء خادم WebSocket وربطه بخادم HTTP الموجود
+const wss = new WebSocket.Server({ server }); // <--- هنا بنربط الـ WebSocket بخادم Express
 
 const clients = new Set();
 const onlineUsers = new Map();
 
-console.log(`WebSocket server started on port ${PORT}`);
+console.log('WebSocket server is running...');
 
+// دالة لإرسال قائمة المستخدمين المتصلين إلى جميع العملاء
 function broadcastOnlineUsers() {
     const usersArray = Array.from(onlineUsers.keys());
     const message = JSON.stringify({
@@ -36,11 +47,11 @@ wss.on('connection', ws => {
             const parsedMessage = JSON.parse(messageString);
 
             if (parsedMessage.type === 'user_joined' && parsedMessage.username) {
-                ws.username = parsedMessage.username;
-                onlineUsers.set(parsedMessage.username, ws);
+                ws.username = parsedMessage.username; // حفظ اسم المستخدم على كائن الـ WebSocket
+                onlineUsers.set(parsedMessage.username, ws); // إضافة المستخدم للخريطة
                 console.log(`User ${parsedMessage.username} joined.`);
-                broadcastOnlineUsers();
-            } else if (parsedMessage.type === 'chat_message') { // تأكد من التعامل مع رسائل الدردشة
+                broadcastOnlineUsers(); // إرسال القائمة المحدثة للجميع
+            } else if (parsedMessage.type === 'chat_message') {
                 const messageToBroadcast = {
                     type: 'chat_message',
                     sender: parsedMessage.sender || 'Anonymous',
@@ -73,4 +84,10 @@ wss.on('connection', ws => {
     });
 });
 
-console.log('WebSocket server is running...');
+// <--- جديد: التعامل مع طلبات HTTP الأساسية (اختياري)
+// هذا السطر مهم لكي لا يظهر Railway خطأ "No exposed ports"
+// ويمكنك استخدامه لتقديم صفحة بسيطة إذا تم الوصول إلى الخادم عبر HTTP
+app.get('/', (req, res) => {
+    res.send('WebSocket server is running. Connect via WebSocket client.');
+});
+
