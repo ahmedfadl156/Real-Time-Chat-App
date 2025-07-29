@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Real Time Chat App</title>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <!-- Connection status indicator -->
+    <div class="connection-status disconnected" id="connection-status">
+        <i class="fas fa-circle"></i> Connecting...
+    </div>
+
+    <div class="app-container">
+        <!-- Main Chat Area -->
+        <div class="chat-main">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="chat-title">
+                    <i class="fas fa-comments"></i>
+                    ChatFree
+                </div>
+                <div class="user-info">
+                    <div class="online-status"></div>
+                    <span id="current-username">Guest</span>
+                </div>
+            </header>
+
+            <!-- Messages Display Area -->
+            <div id="messages-container" class="messages-area">
+                <!-- Messages will be injected here -->
+            </div>
+
+            <!-- Message Input Area -->
+            <div class="input-area">
+                <form id="message-form" class="input-form">
+                    <div class="input-wrapper">
+                        <textarea id="message-input" class="message-input" placeholder="Type your message..." rows="1"></textarea>
+                    </div>
+                    <button type="submit" class="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                        Send
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Online Users Sidebar -->
+        <aside id="online-users-sidebar" class="sidebar">
+            <h2 class="sidebar-title">
+                <i class="fas fa-users"></i>
+                Online Users
+            </h2>
+            <ul id="users-list" class="users-list">
+                <!-- Users will be injected here -->
+            </ul>
+        </aside>
+    </div>
+
+    <!-- Username Input Modal -->
+    <div id="username-modal" class="username-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Welcome to ChatFlow</h2>
+            <p class="modal-subtitle">Enter your name to start chatting</p>
+            <form id="username-form">
+                <input type="text" id="username-input" class="username-input" placeholder="Your Name" required>
+                <button type="submit" class="start-button">
+                    <i class="fas fa-rocket"></i>
+                    Start Chatting
+                </button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
