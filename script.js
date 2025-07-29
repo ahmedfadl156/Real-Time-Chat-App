@@ -51,7 +51,7 @@ const usersList = document.getElementById('users-list');
 
 
 let currentUser = 'Guest';
-const messages = [];
+let messages = [];
 
 
 let ws; 
@@ -92,6 +92,7 @@ function loadUsername() {
         currentUserNameDisplay.textContent = username; 
         hideUsernameModal();
         generateAvatarProperties(currentUser); 
+        loadMessages();
         connectWebSocket(); 
     } else {
         showUsernameModal(); 
@@ -100,6 +101,24 @@ function loadUsername() {
 
 function saveUsername() {
     localStorage.setItem('chatAppUsername', usernameInput.value);
+}
+
+function saveMessages(){
+    localStorage.setItem('chatMessages' , JSON.stringify(messages))
+}
+
+function loadMessages(){
+    const loadedMessages = localStorage.getItem('chatMessages');
+    console.log('Loading messages from localStorage:', loadedMessages);
+    if(loadedMessages){
+        messages = JSON.parse(loadedMessages);
+        console.log('Parsed messages:', messages);
+        displayMessages();
+    }else{
+        messages = [];
+        console.log('No saved messages found, starting with empty array');
+        displayMessages();
+    }
 }
 
 function updateConnectionStatus(connected) {
@@ -116,6 +135,11 @@ function updateConnectionStatus(connected) {
 }
 
 function displayMessages() {
+    if (!MessagesContainer) {
+        console.error('MessagesContainer not found');
+        return;
+    }
+    
     MessagesContainer.innerHTML = '';
 
     messages.forEach(msg => {
@@ -136,7 +160,9 @@ function displayMessages() {
         `;
         MessagesContainer.insertAdjacentHTML('beforeend', messageHTML);
     });
+    
     MessagesContainer.scrollTop = MessagesContainer.scrollHeight;
+    saveMessages();
 }
 
 function addMessage(sender, content) {
@@ -261,4 +287,5 @@ window.addEventListener('DOMContentLoaded', () => {
     createParticles();
     setupTextareaAutoResize();
     loadUsername(); 
+    loadMessages();
 });
